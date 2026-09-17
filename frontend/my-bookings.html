@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAR - My Bookings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #f5f5f0; color: #1a1a1a; }
+
+        .navbar {
+            background: #fff; padding: 16px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #e8e8e8; position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 22px; font-weight: 700; letter-spacing: 2px; text-decoration: none; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { color: #e8c547; }
+        .nav-links a { text-decoration: none; color: #555; font-size: 14px; margin-left: 20px; }
+
+        .page-header { background: #1a1a1a; color: #fff; padding: 32px 40px; }
+        .page-title { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .page-sub { color: rgba(255,255,255,0.6); font-size: 14px; }
+
+        .content { max-width: 800px; margin: 0 auto; padding: 32px 20px; }
+
+        .booking-card {
+            background: #fff; border-radius: 16px; border: 1px solid #e8e8e8;
+            padding: 20px 24px; margin-bottom: 16px; transition: box-shadow 0.2s;
+        }
+        .booking-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+
+        .booking-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+        .booking-route { font-size: 18px; font-weight: 700; }
+        .booking-operator { font-size: 13px; color: #666; margin-top: 2px; }
+        .booking-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+        .status-confirmed { background: #e8f5e9; color: #27ae60; }
+        .status-pending { background: #fff8e1; color: #f39c12; }
+        .status-cancelled { background: #fce4ec; color: #e74c3c; }
+
+        .booking-mid { display: flex; gap: 24px; flex-wrap: wrap; font-size: 13px; color: #666; margin-bottom: 14px; }
+        .booking-mid span { display: flex; align-items: center; gap: 4px; }
+
+        .booking-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid #f0f0f0; padding-top: 14px; }
+        .pnr-display { font-family: monospace; font-size: 13px; color: #888; }
+        .pnr-value { font-weight: 700; color: #1a1a1a; letter-spacing: 1px; }
+        .fare-display { font-size: 16px; font-weight: 700; }
+
+        .view-btn {
+            padding: 8px 18px; background: #1a1a1a; color: #fff; border: none;
+            border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+            font-family: inherit;
+        }
+        .view-btn:hover { background: #333; }
+
+        .empty-state { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; border: 1px solid #e8e8e8; }
+        .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+        .empty-state p { color: #888; margin-bottom: 20px; }
+        .empty-btn { padding: 12px 28px; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+
+        .loading { text-align: center; padding: 40px; color: #888; }
+        .login-prompt { text-align: center; padding: 60px 20px; background: #fff; border-radius: 16px; border: 1px solid #e8e8e8; }
+        .login-prompt a { color: #1a1a1a; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="home.html" class="logo"><span class="logo-icon">✦</span>SAFAR</a>
+    <div class="nav-links">
+        <a href="home.html">Home</a>
+    </div>
+</header>
+
+<div class="page-header">
+    <div class="page-title">My Bookings</div>
+    <div class="page-sub" id="userSub">Your journey history</div>
+</div>
+
+<div class="content" id="mainContent">
+    <div class="loading">Loading your bookings...</div>
+</div>
+
+<script>
+    const API = 'http://localhost:3000/api';
+    const token = localStorage.getItem('safarToken');
+    const user = JSON.parse(localStorage.getItem('safarUser') || 'null');
+
+    if (user) document.getElementById('userSub').textContent = 'Welcome back, ' + user.name;
+
+    if (!token) {
+        document.getElementById('mainContent').innerHTML = `
+        <div class="login-prompt">
+            <div style="font-size:40px;margin-bottom:12px;">🔒</div>
+            <h3>Login to view bookings</h3>
+            <p>Please login to see your booking history.</p>
+            <br>
+            <a href="login.html?redirect=my-bookings.html">
+                <button style="padding:12px 28px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Login</button>
+            </a>
+        </div>`;
+    } else {
+        loadBookings();
+    }
+
+    async function loadBookings() {
+        try {
+            const res = await fetch(API + '/bookings/my', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                document.getElementById('mainContent').innerHTML = '<div class="loading">Could not load bookings.</div>';
+                return;
+            }
+
+            const bookings = data.bookings || [];
+            if (!bookings.length) {
+                document.getElementById('mainContent').innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size:40px;margin-bottom:12px;">🚌</div>
+                    <h3>No bookings yet</h3>
+                    <p>You haven't booked any trips. Start your journey today!</p>
+                    <button class="empty-btn" onclick="window.location.href='home.html'">Book a Bus</button>
+                </div>`;
+                return;
+            }
+
+            document.getElementById('mainContent').innerHTML = bookings.map(b => {
+                const statusClass = 'status-' + b.status;
+                const statusText = b.status.charAt(0).toUpperCase() + b.status.slice(1);
+                const journeyDate = new Date(b.journey_date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+
+                return `
+                <div class="booking-card">
+                    <div class="booking-top">
+                        <div>
+                            <div class="booking-route">${b.source} → ${b.destination}</div>
+                            <div class="booking-operator">${b.operator} · ${b.departure_time} → ${b.arrival_time}</div>
+                        </div>
+                        <span class="booking-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="booking-mid">
+                        <span>📅 ${journeyDate}</span>
+                    </div>
+                    <div class="booking-footer">
+                        <div>
+                            <div class="pnr-display">PNR: <span class="pnr-value">${b.pnr}</span></div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="fare-display">₹${b.total_fare}</div>
+                            ${b.status === 'confirmed' ? `<button class="view-btn" onclick="window.location.href='ticket.html?pnr=${b.pnr}'">View Ticket</button>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        } catch (e) {
+            document.getElementById('mainContent').innerHTML = '<div class="loading">Could not connect to server.</div>';
+        }
+    }
+</script>
+
+</body>
+</html>

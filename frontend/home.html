@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SAFAR | Travel Your Way</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="home.css">
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+
+    <div class="logo">
+        <span class="logo-icon">✦</span>
+        SAFAR
+    </div>
+
+    <nav class="nav-links">
+
+        <a href="#home" class="active">Home</a>
+
+        <a href="#features">Why SAFAR</a>
+
+        <a href="#offers">Offers</a>
+
+        <a href="#safety">Safety</a>
+
+        <a href="#help">Help</a>
+
+    </nav>
+
+    <div class="nav-right">
+
+        <!-- LANGUAGE -->
+
+        <div class="language-wrapper">
+
+            <button class="language-btn" id="languageBtn">
+                🌐 <span id="selectedLanguage">English</span>
+                <span class="arrow">⌄</span>
+            </button>
+
+            <div class="language-menu" id="languageMenu">
+
+                <button data-language="English">
+                    English
+                </button>
+
+                <button data-language="हिन्दी">
+                    हिन्दी
+                </button>
+
+                <button data-language="മലയാളം">
+                    മലയാളം
+                </button>
+
+                <button data-language="தமிழ்">
+                    தமிழ்
+                </button>
+
+                <button data-language="తెలుగు">
+                    తెలుగు
+                </button>
+
+                <button data-language="ಕನ್ನಡ">
+                    ಕನ್ನಡ
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- ACCOUNT -->
+
+        <button class="account-btn" id="accountBtn">
+            <span class="account-icon">◯</span>
+            <span id="accountLabel">Account</span>
+        </button>
+
+        <button class="account-btn" id="myBookingsBtn" style="display:none;margin-left:8px;">
+            <span>🎫 My Trips</span>
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- ================= HERO ================= -->
+
+<main id="home">
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-badge">
+            ✨ Travel made for everyone
+        </div>
+
+        <h1>
+            Your journey.
+            <br>
+            <span>Your way.</span>
+        </h1>
+
+        <p>
+            Discover buses, better fares and a journey designed
+            around you.
+        </p>
+
+    </div>
+
+
+    <!-- SEARCH CARD -->
+
+    <div class="search-card">
+
+        <div class="search-title">
+
+            <div>
+                <h2>Where are you going?</h2>
+
+                <p>
+                    Find your perfect bus in seconds
+                </p>
+            </div>
+
+            <div class="route-icon">
+                🚌
+            </div>
+
+        </div>
+
+
+        <div class="search-fields">
+
+            <!-- FROM -->
+
+            <div class="location-field">
+
+                <span class="field-icon">
+                    📍
+                </span>
+
+                <div class="field-content">
+
+                    <label>FROM</label>
+
+                    <input
+                        type="text"
+                        id="from"
+                        placeholder="Leaving from"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- SWAP -->
+
+            <button
+                class="swap-btn"
+                id="swapBtn"
+                title="Swap locations"
+            >
+                ⇄
+            </button>
+
+
+            <!-- TO -->
+
+            <div class="location-field">
+
+                <span class="field-icon">
+                    📍
+                </span>
+
+                <div class="field-content">
+
+                    <label>TO</label>
+
+                    <input
+                        type="text"
+                        id="to"
+                        placeholder="Going to"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div class="date-field">
+
+                <span class="field-icon">
+                    📅
+                </span>
+
+                <div class="field-content">
+
+                    <label>TRAVEL DATE</label>
+
+                    <input
+                        type="date"
+                        id="travelDate"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- PASSENGERS -->
+
+            <div class="passenger-field">
+
+                <span class="field-icon">
+                    👥
+                </span>
+
+                <div class="field-content">
+
+                    <label>PASSENGERS</label>
+
+                    <button
+                        class="passenger-selector"
+                        id="passengerSelector"
+                    >
+                        <span id="passengerCount">
+                            1 Passenger
+                        </span>
+
+                        <span>⌄</span>
+                    </button>
+
+                </div>
+
+                <!-- PASSENGER POPUP -->
+
+                <div
+                    class="passenger-popup"
+                    id="passengerPopup"
+                >
+
+                    <div class="passenger-row">
+
+                        <div>
+                            <strong>Adults</strong>
+                            <small>Age 13+</small>
+                        </div>
+
+                        <div class="counter">
+
+                            <button
+                                class="counter-btn"
+                                data-type="adult"
+                                data-action="minus"
+                            >
+                                −
+                            </button>
+
+                            <span id="adultCount">1</span>
+
+                            <button
+                                class="counter-btn"
+                                data-type="adult"
+                                data-action="plus"
+                            >
+                                +
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="passenger-row">
+
+                        <div>
+                            <strong>Children</strong>
+                            <small>Age 5–12</small>
+                        </div>
+
+                        <div class="counter">
+
+                            <button
+                                class="counter-btn"
+                                data-type="child"
+                                data-action="minus"
+                            >
+                                −
+                            </button>
+
+                            <span id="childCount">0</span>
+
+                            <button
+                                class="counter-btn"
+                                data-type="child"
+                                data-action="plus"
+                            >
+                                +
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        class="done-btn"
+                        id="passengerDone"
+                    >
+                        Done
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PREFERENCES -->
+
+        <div class="preferences">
+
+            <label class="preference-option">
+
+                <input
+                    type="checkbox"
+                    id="studentPreference"
+                >
+
+                <span class="custom-check"></span>
+
+                <span>
+                    🎓 Student
+                </span>
+
+            </label>
+
+
+            <label class="preference-option">
+
+                <input
+                    type="checkbox"
+                    id="accessibilityPreference"
+                >
+
+                <span class="custom-check"></span>
+
+                <span>
+                    ♿ Accessibility
+                </span>
+
+            </label>
+
+
+            <label class="preference-option">
+
+                <input
+                    type="checkbox"
+                    id="womenPreference"
+                >
+
+                <span class="custom-check"></span>
+
+                <span>
+                    👩 Prefer women-friendly seating
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <!-- SEARCH -->
+
+        <button
+            class="search-btn"
+            id="searchBtn"
+        >
+            <span>🔍</span>
+            SEARCH BUSES
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ================= QUICK BENEFITS ================= -->
+
+<section class="benefits-section">
+
+    <div class="benefit-card">
+
+        <div class="benefit-icon student">
+            🎓
+        </div>
+
+        <div>
+            <h3>Student Savings</h3>
+
+            <p>
+                Upload your student ID and unlock
+                special fares.
+            </p>
+        </div>
+
+        <span class="benefit-arrow">→</span>
+
+    </div>
+
+
+    <div class="benefit-card">
+
+        <div class="benefit-icon accessibility">
+            ♿
+        </div>
+
+        <div>
+            <h3>Accessible Travel</h3>
+
+            <p>
+                Find buses and seats designed
+                for accessibility.
+            </p>
+        </div>
+
+        <span class="benefit-arrow">→</span>
+
+    </div>
+
+
+    <div class="benefit-card">
+
+        <div class="benefit-icon women">
+            👩
+        </div>
+
+        <div>
+            <h3>Women-friendly</h3>
+
+            <p>
+                Choose women-friendly seating
+                preferences.
+            </p>
+        </div>
+
+        <span class="benefit-arrow">→</span>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section
+    class="features-section"
+    id="features"
+>
+
+    <div class="section-heading">
+
+        <span>WHY SAFAR?</span>
+
+        <h2>
+            A journey designed
+            <br>
+            around <em>you.</em>
+        </h2>
+
+        <p>
+            We don't just help you book a bus.
+            We help make your journey comfortable,
+            affordable and accessible.
+        </p>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+        <div class="feature-card large">
+
+            <div class="feature-number">
+                01
+            </div>
+
+            <div class="large-feature-icon">
+                🎓
+            </div>
+
+            <h3>
+                Student Pass
+            </h3>
+
+            <p>
+                Students with a verified college ID
+                can unlock specially designed travel fares.
+            </p>
+
+            <button
+                class="feature-link"
+                id="studentBtn"
+            >
+                Verify student ID →
+            </button>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-number">
+                02
+            </div>
+
+            <div class="feature-icon-big">
+                ♿
+            </div>
+
+            <h3>
+                Accessible journeys
+            </h3>
+
+            <p>
+                Easily identify buses and seats
+                with accessibility support.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-number">
+                03
+            </div>
+
+            <div class="feature-icon-big">
+                🌐
+            </div>
+
+            <h3>
+                Your language
+            </h3>
+
+            <p>
+                Explore SAFAR in the language
+                you're most comfortable with.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card safety-feature">
+
+            <div class="feature-number">
+                04
+            </div>
+
+            <div class="feature-icon-big">
+                🛡️
+            </div>
+
+            <h3>
+                Journey safety
+            </h3>
+
+            <p>
+                Keep important safety tools and
+                emergency contacts close during your trip.
+            </p>
+
+            <a href="#safety">
+                Explore safety →
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= STUDENT SECTION ================= -->
+
+<section class="student-section">
+
+    <div class="student-content">
+
+        <span class="eyebrow">
+            🎓 SAFAR STUDENT
+        </span>
+
+        <h2>
+            Your student ID
+            <br>
+            can take you <em>further.</em>
+        </h2>
+
+        <p>
+            Verify your college identity once and
+            unlock eligible student fares for your journeys.
+        </p>
+
+        <button
+            class="primary-light-btn"
+            id="verifyStudentBtn"
+        >
+            Verify Student ID →
+        </button>
+
+    </div>
+
+
+    <div class="student-ticket">
+
+        <div class="ticket-top">
+
+            <span>SAFAR</span>
+
+            <span>STUDENT PASS</span>
+
+        </div>
+
+        <div class="ticket-icon">
+            🎓
+        </div>
+
+        <div class="ticket-info">
+
+            <span>STUDENT FARE</span>
+
+            <strong>
+                Special price
+            </strong>
+
+            <small>
+                After verification
+            </small>
+
+        </div>
+
+        <div class="ticket-line"></div>
+
+        <div class="ticket-bottom">
+
+            <span>VALID STUDENT ID</span>
+
+            <span>✓</span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= OFFERS ================= -->
+
+<section
+    class="offers-section"
+    id="offers"
+>
+
+    <div class="section-heading center">
+
+        <span>SAVE MORE</span>
+
+        <h2>
+            Offers made for
+            <em>you.</em>
+        </h2>
+
+    </div>
+
+
+    <div class="offers-grid">
+
+        <div class="offer-card student-offer">
+
+            <div class="offer-top">
+
+                <span class="offer-tag">
+                    STUDENTS
+                </span>
+
+                <span class="offer-emoji">
+                    🎓
+                </span>
+
+            </div>
+
+            <h3>
+                Student fares
+            </h3>
+
+            <p>
+                Verify your student ID to access
+                eligible discounted fares.
+            </p>
+
+            <button>
+                Check eligibility →
+            </button>
+
+        </div>
+
+
+        <div class="offer-card first-trip">
+
+            <div class="offer-top">
+
+                <span class="offer-tag">
+                    NEW USERS
+                </span>
+
+                <span class="offer-emoji">
+                    🚌
+                </span>
+
+            </div>
+
+            <h3>
+                First SAFAR
+            </h3>
+
+            <p>
+                Look out for special introductory
+                offers on eligible journeys.
+            </p>
+
+            <button>
+                Explore buses →
+            </button>
+
+        </div>
+
+
+        <div class="offer-card safety-offer">
+
+            <div class="offer-top">
+
+                <span class="offer-tag">
+                    SAFETY
+                </span>
+
+                <span class="offer-emoji">
+                    🛡️
+                </span>
+
+            </div>
+
+            <h3>
+                Travel confidently
+            </h3>
+
+            <p>
+                Keep your emergency contact
+                and safety options ready.
+            </p>
+
+            <button>
+                Learn more →
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= POPULAR ROUTES ================= -->
+
+<section class="routes-section">
+
+    <div class="section-heading">
+
+        <span>EXPLORE</span>
+
+        <h2>
+            Popular journeys
+        </h2>
+
+        <p>
+            Start your next SAFAR from here.
+        </p>
+
+    </div>
+
+
+    <div class="route-grid">
+
+        <div class="route-card">
+
+            <div class="route-cities">
+
+                <strong>
+                    Kochi
+                </strong>
+
+                <span>→</span>
+
+                <strong>
+                    Bangalore
+                </strong>
+
+            </div>
+
+            <div class="route-details">
+
+                <span>
+                    🚌 Multiple buses
+                </span>
+
+                <span>
+                    From ₹499
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="route-card">
+
+            <div class="route-cities">
+
+                <strong>
+                    Trivandrum
+                </strong>
+
+                <span>→</span>
+
+                <strong>
+                    Kochi
+                </strong>
+
+            </div>
+
+            <div class="route-details">
+
+                <span>
+                    🚌 Multiple buses
+                </span>
+
+                <span>
+                    From ₹199
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="route-card">
+
+            <div class="route-cities">
+
+                <strong>
+                    Chennai
+                </strong>
+
+                <span>→</span>
+
+                <strong>
+                    Bangalore
+                </strong>
+
+            </div>
+
+            <div class="route-details">
+
+                <span>
+                    🚌 Multiple buses
+                </span>
+
+                <span>
+                    From ₹399
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="route-card">
+
+            <div class="route-cities">
+
+                <strong>
+                    Coimbatore
+                </strong>
+
+                <span>→</span>
+
+                <strong>
+                    Kochi
+                </strong>
+
+            </div>
+
+            <div class="route-details">
+
+                <span>
+                    🚌 Multiple buses
+                </span>
+
+                <span>
+                    From ₹299
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= SAFETY ================= -->
+
+<section
+    class="safety-section"
+    id="safety"
+>
+
+    <div class="safety-icon">
+        🛡️
+    </div>
+
+    <div class="safety-content">
+
+        <span>
+            SAFAR SAFETY
+        </span>
+
+        <h2>
+            Your journey.
+            <br>
+            Your safety net.
+        </h2>
+
+        <p>
+            Keep emergency contacts, journey information
+            and safety tools within easy reach.
+        </p>
+
+    </div>
+
+    <button
+        class="safety-btn"
+        id="safetyBtn"
+    >
+        Explore safety
+    </button>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer id="help">
+
+    <div class="footer-main">
+
+        <div class="footer-brand">
+
+            <div class="logo">
+                <span class="logo-icon">✦</span>
+                SAFAR
+            </div>
+
+            <p>
+                Your journey. Your way.
+            </p>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>SAFAR</h4>
+
+            <a href="#home">Home</a>
+            <a href="#features">Why SAFAR</a>
+            <a href="#offers">Offers</a>
+            <a href="#safety">Safety</a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>FOR TRAVELLERS</h4>
+
+            <a href="#">Book a bus</a>
+            <a href="#">My trips</a>
+            <a href="#">Student Pass</a>
+            <a href="#">Accessibility</a>
+
+        </div>
+
+
+        <div class="footer-column">
+
+            <h4>HELP</h4>
+
+            <a href="#">Help centre</a>
+            <a href="#">Contact us</a>
+            <a href="#">Cancellation</a>
+            <a href="#">Terms</a>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer-bottom">
+
+        <span>
+            © 2026 SAFAR. All rights reserved.
+        </span>
+
+        <span>
+            Made for every journey.
+        </span>
+
+    </div>
+
+</footer>
+
+
+<!-- ================= LOGIN MODAL ================= -->
+
+<div
+    class="modal-overlay"
+    id="loginModal"
+>
+
+    <div class="modal">
+
+        <button
+            class="close-modal"
+            id="closeModal"
+        >
+            ×
+        </button>
+
+        <div class="modal-icon">
+            👋
+        </div>
+
+        <h2>
+            Welcome to SAFAR
+        </h2>
+
+        <p>
+            Login to manage your journeys,
+            student pass and bookings.
+        </p>
+
+        <button
+            class="modal-login-btn"
+            onclick="window.location.href='login.html'"
+        >
+            LOGIN
+        </button>
+
+        <p class="modal-signup">
+            New to SAFAR?
+            <a href="signup.html">Create an account</a>
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ================= STUDENT MODAL ================= -->
+
+<div
+    class="modal-overlay"
+    id="studentModal"
+>
+
+    <div class="modal student-modal">
+
+        <button
+            class="close-modal"
+            id="closeStudentModal"
+        >
+            ×
+        </button>
+
+        <div class="modal-icon">
+            🎓
+        </div>
+
+        <h2>
+            SAFAR Student Pass
+        </h2>
+
+        <p>
+            Upload your valid college ID to
+            apply for student fare verification.
+        </p>
+
+        <div class="upload-box">
+
+            <div>
+                📄
+            </div>
+
+            <strong>
+                Upload Student ID
+            </strong>
+
+            <small>
+                JPG, PNG or PDF
+            </small>
+
+            <input
+                type="file"
+                id="studentIdFile"
+                accept=".jpg,.jpeg,.png,.pdf"
+            >
+
+        </div>
+
+        <button
+            class="modal-login-btn"
+            id="uploadStudentBtn"
+        >
+            SUBMIT FOR VERIFICATION
+        </button>
+
+        <small class="verification-note">
+            Verification status will be shown in your account.
+        </small>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

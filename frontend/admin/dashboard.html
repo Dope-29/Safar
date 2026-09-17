@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAR Admin - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #0f0f0f; color: #fff; display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 220px; background: #1a1a1a; border-right: 1px solid #2a2a2a;
+            padding: 24px 0; position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
+            display: flex; flex-direction: column;
+        }
+        .sidebar-brand { padding: 0 20px 24px; border-bottom: 1px solid #2a2a2a; margin-bottom: 16px; }
+        .sidebar-brand .logo { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+        .sidebar-brand .logo-icon { color: #e8c547; }
+        .sidebar-brand .sub { font-size: 10px; color: #555; letter-spacing: 1px; margin-top: 2px; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 10px; padding: 11px 20px;
+            color: #888; text-decoration: none; font-size: 14px; font-weight: 500;
+            cursor: pointer; transition: all 0.15s; border: none; background: none; width: 100%; text-align: left; font-family: inherit;
+        }
+        .nav-item:hover, .nav-item.active { background: #252525; color: #fff; }
+        .nav-item.active { border-left: 3px solid #e8c547; }
+
+        .sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid #2a2a2a; }
+        .admin-name { font-size: 13px; color: #888; margin-bottom: 8px; }
+        .logout-btn { font-size: 13px; color: #e74c3c; cursor: pointer; background: none; border: none; font-family: inherit; }
+
+        .main { margin-left: 220px; flex: 1; padding: 28px 32px; overflow-y: auto; }
+
+        .page-title { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+        .page-sub { color: #666; font-size: 14px; margin-bottom: 28px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .stat-card { background: #1a1a1a; border-radius: 12px; padding: 20px; border: 1px solid #2a2a2a; }
+        .stat-label { font-size: 11px; color: #666; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .stat-icon { font-size: 24px; margin-bottom: 8px; }
+        .stat-yellow { color: #e8c547; }
+        .stat-green { color: #27ae60; }
+        .stat-blue { color: #3498db; }
+        .stat-red { color: #e74c3c; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .table-card { background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a; overflow: hidden; }
+        .table-header { padding: 18px 20px; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center; }
+        .table-title { font-size: 15px; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #666; border-bottom: 1px solid #2a2a2a; }
+        td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid #1f1f1f; color: #ccc; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #1f1f1f; }
+
+        .badge { padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+        .badge-pending { background: #333; color: #f39c12; }
+        .badge-approved { background: #1a3d2a; color: #27ae60; }
+        .badge-rejected { background: #3d1a1a; color: #e74c3c; }
+        .badge-confirmed { background: #1a3d2a; color: #27ae60; }
+
+        .action-btns { display: flex; gap: 6px; }
+        .btn-approve { padding: 5px 12px; background: #27ae60; color: #fff; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-reject { padding: 5px 12px; background: #e74c3c; color: #fff; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+        .btn-view { padding: 5px 12px; background: #3498db; color: #fff; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; }
+
+        .add-form-card { background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a; padding: 24px; margin-bottom: 24px; }
+        .add-form-title { font-size: 15px; font-weight: 700; margin-bottom: 18px; }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        @media (max-width: 800px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #666; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px 12px; background: #0f0f0f; border: 1.5px solid #333;
+            border-radius: 7px; color: #fff; font-size: 13px; font-family: inherit; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: #e8c547; }
+        .form-group select option { background: #1a1a1a; }
+        .submit-btn {
+            padding: 10px 24px; background: #e8c547; color: #0f0f0f; border: none;
+            border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+        }
+
+        .no-data { padding: 40px; text-align: center; color: #555; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="logo"><span class="logo-icon">✦</span> SAFAR</div>
+        <div class="sub">ADMIN PANEL</div>
+    </div>
+
+    <button class="nav-item active" data-section="dashboard">📊 Dashboard</button>
+    <button class="nav-item" data-section="verifications">🎓 Verifications</button>
+    <button class="nav-item" data-section="bookings">🎫 Bookings</button>
+    <button class="nav-item" data-section="buses">🚌 Buses</button>
+    <button class="nav-item" data-section="routes">🗺️ Routes</button>
+
+    <div class="sidebar-footer">
+        <div class="admin-name" id="adminName">—</div>
+        <button class="logout-btn" onclick="logout()">Logout →</button>
+    </div>
+</aside>
+
+<main class="main">
+
+    <section class="section active" id="section-dashboard">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub" id="dashDate">Loading...</div>
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-label">Total Users</div><div class="stat-value stat-blue" id="s-users">—</div></div>
+            <div class="stat-card"><div class="stat-icon">🎫</div><div class="stat-label">Confirmed Bookings</div><div class="stat-value stat-green" id="s-bookings">—</div></div>
+            <div class="stat-card"><div class="stat-icon">🎓</div><div class="stat-label">Pending Verifications</div><div class="stat-value stat-yellow" id="s-verifications">—</div></div>
+            <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Total Revenue</div><div class="stat-value stat-green" id="s-revenue">—</div></div>
+        </div>
+    </section>
+
+    <section class="section" id="section-verifications">
+        <div class="page-title">Student Verifications</div>
+        <div class="page-sub">Review and approve student ID submissions</div>
+        <div class="table-card">
+            <div class="table-header"><div class="table-title">Pending & All Requests</div><button class="submit-btn" onclick="loadVerifications()">↻ Refresh</button></div>
+            <div style="overflow-x:auto;"><table>
+                <thead><tr><th>ID</th><th>Student</th><th>College</th><th>Branch</th><th>User</th><th>Submitted</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="verTable"><tr><td colspan="8" class="no-data">Loading...</td></tr></tbody>
+            </table></div>
+        </div>
+    </section>
+
+    <section class="section" id="section-bookings">
+        <div class="page-title">All Bookings</div>
+        <div class="page-sub">View all passenger bookings</div>
+        <div class="table-card">
+            <div class="table-header"><div class="table-title">Recent Bookings (last 100)</div><button class="submit-btn" onclick="loadBookings()">↻ Refresh</button></div>
+            <div style="overflow-x:auto;"><table>
+                <thead><tr><th>PNR</th><th>User</th><th>Route</th><th>Date</th><th>Fare</th><th>Status</th></tr></thead>
+                <tbody id="bookTable"><tr><td colspan="6" class="no-data">Loading...</td></tr></tbody>
+            </table></div>
+        </div>
+    </section>
+
+    <section class="section" id="section-buses">
+        <div class="page-title">Manage Buses</div>
+        <div class="page-sub">Add or deactivate buses</div>
+
+        <div class="add-form-card">
+            <div class="add-form-title">Add New Bus</div>
+            <div class="form-grid">
+                <div class="form-group"><label>Route</label><select id="b_route"><option value="">Select route</option></select></div>
+                <div class="form-group"><label>Bus Number</label><input type="text" id="b_num" placeholder="KL07 XXXX"></div>
+                <div class="form-group"><label>Operator</label><input type="text" id="b_op" placeholder="KSRTC / Travels"></div>
+                <div class="form-group"><label>Departure</label><input type="time" id="b_dep"></div>
+                <div class="form-group"><label>Arrival</label><input type="time" id="b_arr"></div>
+                <div class="form-group"><label>Fare (₹)</label><input type="number" id="b_fare" placeholder="499"></div>
+                <div class="form-group"><label>Amenities</label><input type="text" id="b_amen" placeholder="AC, WiFi, Charging"></div>
+            </div>
+            <div style="margin-top:16px;"><button class="submit-btn" onclick="addBus()">Add Bus</button></div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header"><div class="table-title">All Buses</div><button class="submit-btn" onclick="loadBuses()">↻ Refresh</button></div>
+            <div style="overflow-x:auto;"><table>
+                <thead><tr><th>ID</th><th>Bus No.</th><th>Route</th><th>Operator</th><th>Time</th><th>Fare</th><th>Seats</th><th>Action</th></tr></thead>
+                <tbody id="busTable"><tr><td colspan="8" class="no-data">Loading...</td></tr></tbody>
+            </table></div>
+        </div>
+    </section>
+
+    <section class="section" id="section-routes">
+        <div class="page-title">Manage Routes</div>
+        <div class="page-sub">Add new routes</div>
+
+        <div class="add-form-card">
+            <div class="add-form-title">Add New Route</div>
+            <div class="form-grid">
+                <div class="form-group"><label>Source City</label><input type="text" id="r_src" placeholder="Mumbai"></div>
+                <div class="form-group"><label>Destination City</label><input type="text" id="r_dst" placeholder="Pune"></div>
+                <div class="form-group"><label>Distance (km)</label><input type="number" id="r_dist" placeholder="150"></div>
+                <div class="form-group"><label>Base Fare (₹)</label><input type="number" id="r_fare" placeholder="249"></div>
+            </div>
+            <div style="margin-top:16px;"><button class="submit-btn" onclick="addRoute()">Add Route</button></div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header"><div class="table-title">All Routes</div><button class="submit-btn" onclick="loadRoutes()">↻ Refresh</button></div>
+            <div style="overflow-x:auto;"><table>
+                <thead><tr><th>ID</th><th>Source</th><th>Destination</th><th>Distance</th><th>Base Fare</th></tr></thead>
+                <tbody id="routeTable"><tr><td colspan="5" class="no-data">Loading...</td></tr></tbody>
+            </table></div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    const API = 'http://localhost:3000/api';
+    const adminToken = localStorage.getItem('safarAdminToken');
+    const adminName = localStorage.getItem('safarAdminName');
+
+    if (!adminToken) window.location.href = 'login.html';
+
+    document.getElementById('adminName').textContent = adminName || 'Admin';
+    document.getElementById('dashDate').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+    const authHeaders = { 'Authorization': 'Bearer ' + adminToken, 'Content-Type': 'application/json' };
+
+    function logout() {
+        localStorage.removeItem('safarAdminToken');
+        localStorage.removeItem('safarAdminName');
+        window.location.href = 'login.html';
+    }
+
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+            const sec = 'section-' + this.dataset.section;
+            document.getElementById(sec).classList.add('active');
+            if (this.dataset.section === 'verifications') loadVerifications();
+            if (this.dataset.section === 'bookings') loadBookings();
+            if (this.dataset.section === 'buses') { loadBuses(); loadRoutesForSelect(); }
+            if (this.dataset.section === 'routes') loadRoutes();
+        });
+    });
+
+    async function apiFetch(path, opts = {}) {
+        const res = await fetch(API + path, { headers: authHeaders, ...opts });
+        return res.json();
+    }
+
+    async function loadDashboard() {
+        const d = await apiFetch('/admin/dashboard');
+        document.getElementById('s-users').textContent = d.totalUsers || 0;
+        document.getElementById('s-bookings').textContent = d.totalBookings || 0;
+        document.getElementById('s-verifications').textContent = d.pendingVerifications || 0;
+        document.getElementById('s-revenue').textContent = '₹' + (d.revenue || 0).toLocaleString('en-IN');
+    }
+
+    async function loadVerifications() {
+        const d = await apiFetch('/admin/verifications');
+        const tbody = document.getElementById('verTable');
+        if (!d.records?.length) { tbody.innerHTML = '<tr><td colspan="8" class="no-data">No verification requests yet.</td></tr>'; return; }
+        tbody.innerHTML = d.records.map(r => `
+        <tr>
+            <td>${r.id}</td>
+            <td>${r.student_name}</td>
+            <td>${r.college_name}</td>
+            <td>${r.branch}</td>
+            <td>${r.user_name || '—'}<br><small style="color:#555">${r.user_email || ''}</small></td>
+            <td>${new Date(r.submitted_at).toLocaleDateString('en-IN')}</td>
+            <td><span class="badge badge-${r.status}">${r.status}</span></td>
+            <td>
+                ${r.status === 'pending' ? `
+                <div class="action-btns">
+                    <button class="btn-approve" onclick="approveVer(${r.id})">Approve</button>
+                    <button class="btn-reject" onclick="rejectVer(${r.id})">Reject</button>
+                </div>` : '—'}
+                ${r.id_card_path ? `<a href="http://localhost:3000/uploads/${r.id_card_path}" target="_blank"><button class="btn-view" style="margin-top:4px">View ID</button></a>` : ''}
+            </td>
+        </tr>`).join('');
+    }
+
+    async function approveVer(id) {
+        await fetch(`${API}/admin/verifications/${id}/approve`, { method: 'POST', headers: authHeaders });
+        loadVerifications(); loadDashboard();
+    }
+    async function rejectVer(id) {
+        await fetch(`${API}/admin/verifications/${id}/reject`, { method: 'POST', headers: authHeaders });
+        loadVerifications();
+    }
+
+    async function loadBookings() {
+        const d = await apiFetch('/admin/bookings');
+        const tbody = document.getElementById('bookTable');
+        if (!d.bookings?.length) { tbody.innerHTML = '<tr><td colspan="6" class="no-data">No bookings yet.</td></tr>'; return; }
+        tbody.innerHTML = d.bookings.map(b => `
+        <tr>
+            <td style="font-family:monospace;font-weight:600;">${b.pnr}</td>
+            <td>${b.user_name || 'Guest'}<br><small style="color:#555">${b.user_email || ''}</small></td>
+            <td>${b.source} → ${b.destination}</td>
+            <td>${new Date(b.journey_date + 'T00:00:00').toLocaleDateString('en-IN')}</td>
+            <td>₹${b.total_fare}</td>
+            <td><span class="badge badge-${b.status}">${b.status}</span></td>
+        </tr>`).join('');
+    }
+
+    async function loadBuses() {
+        const d = await apiFetch('/admin/buses');
+        const tbody = document.getElementById('busTable');
+        if (!d.buses?.length) { tbody.innerHTML = '<tr><td colspan="8" class="no-data">No buses.</td></tr>'; return; }
+        tbody.innerHTML = d.buses.map(b => `
+        <tr>
+            <td>${b.id}</td>
+            <td>${b.bus_number}</td>
+            <td>${b.source} → ${b.destination}</td>
+            <td>${b.operator}</td>
+            <td>${b.departure_time} – ${b.arrival_time}</td>
+            <td>₹${b.fare}</td>
+            <td>${b.available_seats}/${b.total_seats}</td>
+            <td><button class="btn-reject" onclick="deactivateBus(${b.id})">Deactivate</button></td>
+        </tr>`).join('');
+    }
+
+    async function loadRoutesForSelect() {
+        const d = await apiFetch('/admin/routes');
+        const sel = document.getElementById('b_route');
+        sel.innerHTML = '<option value="">Select route</option>' + (d.routes || []).map(r => `<option value="${r.id}">${r.source} → ${r.destination}</option>`).join('');
+    }
+
+    async function addBus() {
+        const body = {
+            route_id: document.getElementById('b_route').value,
+            bus_number: document.getElementById('b_num').value,
+            operator: document.getElementById('b_op').value,
+            departure_time: document.getElementById('b_dep').value,
+            arrival_time: document.getElementById('b_arr').value,
+            fare: document.getElementById('b_fare').value,
+            amenities: document.getElementById('b_amen').value
+        };
+        if (!body.route_id || !body.bus_number || !body.operator || !body.fare) { alert('Please fill all required fields.'); return; }
+        const res = await fetch(API + '/admin/buses', { method: 'POST', headers: authHeaders, body: JSON.stringify(body) });
+        const d = await res.json();
+        if (!res.ok) { alert(d.error); return; }
+        alert('Bus added successfully!');
+        loadBuses();
+    }
+
+    async function deactivateBus(id) {
+        if (!confirm('Deactivate this bus?')) return;
+        await fetch(`${API}/admin/buses/${id}`, { method: 'DELETE', headers: authHeaders });
+        loadBuses();
+    }
+
+    async function loadRoutes() {
+        const d = await apiFetch('/admin/routes');
+        const tbody = document.getElementById('routeTable');
+        if (!d.routes?.length) { tbody.innerHTML = '<tr><td colspan="5" class="no-data">No routes.</td></tr>'; return; }
+        tbody.innerHTML = d.routes.map(r => `
+        <tr>
+            <td>${r.id}</td>
+            <td>${r.source}</td>
+            <td>${r.destination}</td>
+            <td>${r.distance_km} km</td>
+            <td>₹${r.base_fare}</td>
+        </tr>`).join('');
+    }
+
+    async function addRoute() {
+        const body = {
+            source: document.getElementById('r_src').value,
+            destination: document.getElementById('r_dst').value,
+            distance_km: document.getElementById('r_dist').value,
+            base_fare: document.getElementById('r_fare').value
+        };
+        if (!body.source || !body.destination || !body.base_fare) { alert('Please fill all required fields.'); return; }
+        const res = await fetch(API + '/admin/routes', { method: 'POST', headers: authHeaders, body: JSON.stringify(body) });
+        const d = await res.json();
+        if (!res.ok) { alert(d.error); return; }
+        alert('Route added!');
+        loadRoutes();
+    }
+
+    loadDashboard();
+</script>
+
+</body>
+</html>

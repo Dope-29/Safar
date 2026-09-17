@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAR Admin - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #0f0f0f; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+        .login-box {
+            background: #1a1a1a; border-radius: 20px; padding: 48px 40px;
+            width: 100%; max-width: 420px; border: 1px solid #333;
+        }
+        .brand { display: flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 700; letter-spacing: 2px; margin-bottom: 8px; }
+        .brand-icon { color: #e8c547; }
+        .brand-sub { font-size: 12px; color: #888; letter-spacing: 1px; margin-bottom: 36px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #888; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .form-group input {
+            width: 100%; padding: 12px 16px; background: #0f0f0f; border: 1.5px solid #333;
+            border-radius: 8px; color: #fff; font-size: 14px; font-family: inherit; outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: #e8c547; }
+        .form-group input::placeholder { color: #555; }
+
+        .error-msg { color: #e74c3c; font-size: 13px; margin-bottom: 16px; display: none; }
+
+        .login-btn {
+            width: 100%; background: #e8c547; color: #0f0f0f; border: none;
+            padding: 14px; border-radius: 8px; font-size: 14px; font-weight: 700;
+            cursor: pointer; font-family: inherit; transition: background 0.2s;
+        }
+        .login-btn:hover { background: #d4b140; }
+        .login-btn:disabled { background: #555; color: #888; cursor: not-allowed; }
+
+        .hint { margin-top: 24px; text-align: center; font-size: 12px; color: #555; }
+        .hint strong { color: #777; }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <div class="brand"><span class="brand-icon">✦</span>SAFAR</div>
+        <div class="brand-sub">ADMIN PANEL</div>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="admin" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+
+        <div class="error-msg" id="errMsg"></div>
+
+        <button class="login-btn" id="loginBtn">LOGIN TO ADMIN PANEL</button>
+
+        <div class="hint">Default: <strong>admin</strong> / <strong>admin123</strong></div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        document.getElementById('loginBtn').addEventListener('click', async function () {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errEl = document.getElementById('errMsg');
+            errEl.style.display = 'none';
+
+            if (!username || !password) { errEl.textContent = 'Please enter username and password.'; errEl.style.display = 'block'; return; }
+
+            this.disabled = true;
+            this.textContent = 'Logging in...';
+
+            try {
+                const res = await fetch(API + '/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok) { errEl.textContent = data.error || 'Login failed.'; errEl.style.display = 'block'; return; }
+
+                localStorage.setItem('safarAdminToken', data.token);
+                localStorage.setItem('safarAdminName', data.name);
+                window.location.href = 'dashboard.html';
+            } catch (e) {
+                errEl.textContent = 'Could not connect to server.';
+                errEl.style.display = 'block';
+            } finally {
+                this.disabled = false;
+                this.textContent = 'LOGIN TO ADMIN PANEL';
+            }
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter') document.getElementById('loginBtn').click();
+        });
+    </script>
+
+</body>
+</html>

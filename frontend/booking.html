@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAR - Passenger Details</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #f5f5f0; color: #1a1a1a; }
+
+        .navbar {
+            background: #fff; padding: 16px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #e8e8e8; position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 22px; font-weight: 700; letter-spacing: 2px; text-decoration: none; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { color: #e8c547; }
+
+        .progress-bar {
+            background: #fff; border-bottom: 1px solid #e8e8e8;
+            padding: 16px 40px; display: flex; gap: 0; align-items: center;
+        }
+        .step { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #aaa; }
+        .step.active { color: #1a1a1a; font-weight: 600; }
+        .step.done { color: #27ae60; }
+        .step-num { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .step.active .step-num { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+        .step.done .step-num { border-color: #27ae60; background: #27ae60; color: #fff; }
+        .step-divider { flex: 1; height: 1px; background: #e0e0e0; margin: 0 12px; max-width: 60px; }
+
+        .layout { max-width: 1000px; margin: 0 auto; padding: 32px 20px; display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+        @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+
+        .section-card {
+            background: #fff; border-radius: 16px; border: 1px solid #e8e8e8;
+            padding: 24px; margin-bottom: 20px;
+        }
+        .section-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 8px; }
+
+        .trip-info { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .trip-cities { font-size: 20px; font-weight: 700; }
+        .trip-meta { font-size: 14px; color: #666; }
+        .trip-meta span { margin-right: 16px; }
+
+        .passenger-block { border: 1px solid #e8e8e8; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+        .passenger-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #555; display: flex; align-items: center; gap: 8px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #888; letter-spacing: 0.5px; text-transform: uppercase; }
+        .form-group input, .form-group select {
+            padding: 10px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px;
+            font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: #1a1a1a; }
+
+        .checkbox-row { display: flex; gap: 20px; margin-top: 8px; flex-wrap: wrap; }
+        .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+        .checkbox-label input { width: 16px; height: 16px; cursor: pointer; }
+
+        .student-form { background: #f0f8f0; border: 1.5px solid #c8e6c9; border-radius: 10px; padding: 16px; margin-top: 12px; display: none; }
+        .student-form.show { display: block; }
+        .student-form-title { font-size: 13px; font-weight: 600; color: #27ae60; margin-bottom: 12px; }
+        .upload-area {
+            border: 2px dashed #c8e6c9; border-radius: 8px; padding: 16px;
+            text-align: center; cursor: pointer; margin-top: 8px; background: #fff;
+        }
+        .upload-area:hover { border-color: #27ae60; }
+        .upload-area input { display: none; }
+        .upload-area label { cursor: pointer; font-size: 13px; color: #555; }
+
+        .summary-sticky { position: sticky; top: 80px; }
+        .summary-card { background: #fff; border-radius: 16px; border: 1px solid #e8e8e8; padding: 24px; }
+        .summary-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; color: #555; }
+        .summary-row.total { font-weight: 700; font-size: 16px; color: #1a1a1a; border-top: 1px solid #e8e8e8; padding-top: 12px; margin-top: 4px; }
+        .discount-row { color: #27ae60; }
+
+        .seat-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .legend-box { width: 16px; height: 16px; border-radius: 3px; }
+        .l-general { background: #e8e8e8; }
+        .l-ladies { background: #fce4ec; }
+        .l-priority { background: #e3f2fd; }
+        .l-booked { background: #bdbdbd; }
+        .l-selected { background: #1a1a1a; }
+
+        .seat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .seat {
+            width: 100%; aspect-ratio: 1; border-radius: 6px; border: 1.5px solid #e0e0e0;
+            cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center;
+            font-weight: 600; transition: all 0.15s;
+        }
+        .seat.general { background: #f5f5f5; }
+        .seat.ladies { background: #fce4ec; border-color: #f48fb1; }
+        .seat.priority { background: #e3f2fd; border-color: #90caf9; }
+        .seat.booked { background: #bdbdbd; border-color: #bdbdbd; cursor: not-allowed; color: #888; }
+        .seat.selected { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+        .proceed-btn {
+            width: 100%; background: #1a1a1a; color: #fff; border: none;
+            padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 700;
+            cursor: pointer; font-family: inherit; margin-top: 16px; transition: background 0.2s;
+        }
+        .proceed-btn:hover { background: #333; }
+        .proceed-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .error-msg { color: #e74c3c; font-size: 13px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="home.html" class="logo"><span class="logo-icon">✦</span>SAFAR</a>
+</header>
+
+<div class="progress-bar">
+    <div class="step done"><span class="step-num">✓</span> Search</div>
+    <div class="step-divider"></div>
+    <div class="step done"><span class="step-num">✓</span> Select Bus</div>
+    <div class="step-divider"></div>
+    <div class="step active"><span class="step-num">3</span> Passenger Details</div>
+    <div class="step-divider"></div>
+    <div class="step"><span class="step-num">4</span> Payment</div>
+    <div class="step-divider"></div>
+    <div class="step"><span class="step-num">5</span> Ticket</div>
+</div>
+
+<div class="layout">
+    <div class="main-col">
+
+        <div class="section-card">
+            <div class="section-title">🚌 Trip Summary</div>
+            <div class="trip-info">
+                <div class="trip-cities" id="tripCities">— → —</div>
+                <div class="trip-meta">
+                    <span id="tripDate">—</span>
+                    <span id="tripOperator">—</span>
+                    <span id="tripTimes">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-title">💺 Seat Selection <span style="font-size:12px;color:#888;font-weight:400">(click to select)</span></div>
+            <div class="seat-legend">
+                <div class="legend-item"><div class="legend-box l-general"></div> General</div>
+                <div class="legend-item"><div class="legend-box l-ladies"></div> Ladies</div>
+                <div class="legend-item"><div class="legend-box l-priority"></div> Priority</div>
+                <div class="legend-item"><div class="legend-box l-booked"></div> Booked</div>
+                <div class="legend-item"><div class="legend-box l-selected"></div> Selected</div>
+            </div>
+            <div class="seat-grid" id="seatGrid"><div style="color:#888;font-size:14px">Loading seats...</div></div>
+        </div>
+
+        <div id="passengerForms"></div>
+
+        <div id="formError" class="error-msg"></div>
+
+    </div>
+
+    <div class="summary-sticky">
+        <div class="summary-card">
+            <div class="summary-title">Fare Summary</div>
+            <div id="summaryRows"></div>
+            <button class="proceed-btn" id="proceedBtn">PROCEED TO PAYMENT →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = 'http://localhost:3000/api';
+    const bookingData = JSON.parse(localStorage.getItem('safarBooking') || '{}');
+    const token = localStorage.getItem('safarToken');
+
+    if (!bookingData.busId) { window.location.href = 'home.html'; }
+    if (!token) { window.location.href = 'login.html?redirect=booking.html'; }
+
+    const { busId, operator, fare, from, to, date, adults, children, isStudent } = bookingData;
+    const totalPassengers = (adults || 1) + (children || 0);
+
+    document.getElementById('tripCities').textContent = from + ' → ' + to;
+    document.getElementById('tripDate').textContent = '📅 ' + new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+    document.getElementById('tripOperator').textContent = '🚌 ' + operator;
+
+    let seatData = [];
+    let selectedSeats = [];
+
+    async function loadSeats() {
+        try {
+            const res = await fetch(`${API}/buses/${busId}/seats?date=${date}`);
+            const data = await res.json();
+            seatData = data.seats || [];
+            if (data.bus) {
+                document.getElementById('tripTimes').textContent = '⏰ ' + data.bus.departure_time + ' → ' + data.bus.arrival_time;
+            }
+            renderSeats();
+        } catch (e) {
+            document.getElementById('seatGrid').innerHTML = '<div style="color:#e74c3c">Could not load seats.</div>';
+        }
+    }
+
+    function renderSeats() {
+        const grid = document.getElementById('seatGrid');
+        grid.innerHTML = seatData.map(s => {
+            let cls = s.seat_type;
+            if (s.is_booked) cls += ' booked';
+            if (selectedSeats.includes(s.seat_number)) cls += ' selected';
+            return `<div class="seat ${cls}" data-seat="${s.seat_number}" data-type="${s.seat_type}" data-booked="${s.is_booked}">${s.seat_number}</div>`;
+        }).join('');
+
+        grid.querySelectorAll('.seat:not(.booked)').forEach(el => {
+            el.addEventListener('click', () => toggleSeat(el.dataset.seat));
+        });
+    }
+
+    function toggleSeat(seatNum) {
+        if (selectedSeats.includes(seatNum)) {
+            selectedSeats = selectedSeats.filter(s => s !== seatNum);
+        } else {
+            if (selectedSeats.length >= totalPassengers) {
+                selectedSeats.shift();
+            }
+            selectedSeats.push(seatNum);
+        }
+        renderSeats();
+        assignSeatsToPassengers();
+    }
+
+    function assignSeatsToPassengers() {
+        for (let i = 0; i < totalPassengers; i++) {
+            const seatEl = document.getElementById('seat_p' + i);
+            if (seatEl) seatEl.textContent = selectedSeats[i] || 'Auto-assign';
+        }
+        updateSummary();
+    }
+
+    function buildPassengerForms() {
+        const container = document.getElementById('passengerForms');
+        container.innerHTML = '';
+        for (let i = 0; i < totalPassengers; i++) {
+            const isChild = i >= adults;
+            container.innerHTML += `
+            <div class="section-card">
+                <div class="section-title">👤 Passenger ${i + 1} ${isChild ? '<span style="font-size:12px;color:#888">(Child)</span>' : ''}</div>
+                <div class="passenger-block">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="p${i}_name" placeholder="Full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" id="p${i}_age" placeholder="Age" min="1" max="120" value="${isChild ? '10' : ''}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="p${i}_gender">
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="p${i}_phone" placeholder="10-digit number">
+                        </div>
+                    </div>
+                    <div style="font-size:13px;color:#888;margin-bottom:8px;">
+                        Assigned Seat: <strong id="seat_p${i}">Auto-assign</strong>
+                    </div>
+                    <div class="checkbox-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="p${i}_disabled" onchange="updateSummary()">
+                            ♿ Specially-abled (Priority seat)
+                        </label>
+                        ${isStudent ? `
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="p${i}_student" onchange="toggleStudentForm(${i})">
+                            🎓 Book at student fare
+                        </label>` : ''}
+                    </div>
+                    ${isStudent ? `
+                    <div class="student-form" id="studentForm_${i}">
+                        <div class="student-form-title">🎓 Student Verification Details</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Student Name</label>
+                                <input type="text" id="p${i}_sname" placeholder="As on ID card">
+                            </div>
+                            <div class="form-group">
+                                <label>College Name</label>
+                                <input type="text" id="p${i}_college" placeholder="Your college">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Branch / Department</label>
+                                <input type="text" id="p${i}_branch" placeholder="e.g. Computer Science">
+                            </div>
+                            <div class="form-group">
+                                <label>Age (as on ID)</label>
+                                <input type="number" id="p${i}_sage" placeholder="Age">
+                            </div>
+                        </div>
+                        <div class="upload-area" onclick="document.getElementById('p${i}_idcard').click()">
+                            <label>
+                                📄 Click to upload Student ID Card<br>
+                                <small>JPG, PNG or PDF · Max 5 MB</small>
+                            </label>
+                            <input type="file" id="p${i}_idcard" accept=".jpg,.jpeg,.png,.pdf" onchange="showFileName(${i})">
+                        </div>
+                        <div id="p${i}_filename" style="font-size:12px;color:#27ae60;margin-top:6px;"></div>
+                    </div>` : ''}
+                </div>
+            </div>`;
+        }
+    }
+
+    function toggleStudentForm(i) {
+        const cb = document.getElementById('p' + i + '_student');
+        const form = document.getElementById('studentForm_' + i);
+        if (form) form.classList.toggle('show', cb.checked);
+        updateSummary();
+    }
+
+    function showFileName(i) {
+        const file = document.getElementById('p' + i + '_idcard').files[0];
+        const el = document.getElementById('p' + i + '_filename');
+        if (el && file) el.textContent = '✓ ' + file.name;
+    }
+
+    function updateSummary() {
+        let rows = '';
+        let total = 0;
+        let discountTotal = 0;
+
+        for (let i = 0; i < totalPassengers; i++) {
+            const isStudentP = isStudent && document.getElementById('p' + i + '_student') && document.getElementById('p' + i + '_student').checked;
+            const pFare = isStudentP ? Math.round(fare * 0.7) : fare;
+            const discount = isStudentP ? fare - pFare : 0;
+            rows += `<div class="summary-row"><span>Passenger ${i + 1}</span><span>₹${pFare}${isStudentP ? ' <span style="color:#27ae60;font-size:11px">(Student)</span>' : ''}</span></div>`;
+            total += pFare;
+            discountTotal += discount;
+        }
+
+        if (discountTotal > 0) {
+            rows += `<div class="summary-row discount-row"><span>🎓 Student Discount</span><span>-₹${discountTotal}</span></div>`;
+        }
+        rows += `<div class="summary-row total"><span>Total</span><span>₹${total}</span></div>`;
+        document.getElementById('summaryRows').innerHTML = rows;
+    }
+
+    function collectPassengers() {
+        const passengers = [];
+        for (let i = 0; i < totalPassengers; i++) {
+            const name = document.getElementById('p' + i + '_name').value.trim();
+            const age = document.getElementById('p' + i + '_age').value;
+            const gender = document.getElementById('p' + i + '_gender').value;
+            const phone = document.getElementById('p' + i + '_phone').value.trim();
+            const isSpecial = document.getElementById('p' + i + '_disabled').checked;
+            const isStudentP = isStudent && document.getElementById('p' + i + '_student') && document.getElementById('p' + i + '_student').checked;
+
+            if (!name) throw new Error('Please fill name for Passenger ' + (i + 1));
+            if (!age) throw new Error('Please fill age for Passenger ' + (i + 1));
+            if (!gender) throw new Error('Please select gender for Passenger ' + (i + 1));
+            if (!phone || phone.length < 10) throw new Error('Please enter valid phone for Passenger ' + (i + 1));
+
+            const p = { name, age: parseInt(age), gender, phone, is_specially_abled: isSpecial, is_student: isStudentP };
+            if (selectedSeats[i]) p.seat_number = selectedSeats[i];
+
+            if (isStudentP) {
+                p.studentData = {
+                    studentName: document.getElementById('p' + i + '_sname').value.trim(),
+                    collegeName: document.getElementById('p' + i + '_college').value.trim(),
+                    branch: document.getElementById('p' + i + '_branch').value.trim(),
+                    age: document.getElementById('p' + i + '_sage').value,
+                    phone
+                };
+                if (!p.studentData.studentName || !p.studentData.collegeName || !p.studentData.branch) {
+                    throw new Error('Please fill all student details for Passenger ' + (i + 1));
+                }
+            }
+
+            passengers.push(p);
+        }
+        return passengers;
+    }
+
+    async function submitStudentVerification(passengerId, studentData, idCardFile) {
+        const fd = new FormData();
+        fd.append('studentName', studentData.studentName);
+        fd.append('collegeName', studentData.collegeName);
+        fd.append('branch', studentData.branch);
+        fd.append('age', studentData.age);
+        fd.append('phone', studentData.phone);
+        fd.append('passengerId', passengerId);
+        if (idCardFile) fd.append('idCard', idCardFile);
+
+        await fetch(API + '/student/verify', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: fd
+        });
+    }
+
+    document.getElementById('proceedBtn').addEventListener('click', async function () {
+        const errEl = document.getElementById('formError');
+        errEl.textContent = '';
+
+        let passengers;
+        try {
+            passengers = collectPassengers();
+        } catch (e) {
+            errEl.textContent = e.message;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+
+        this.disabled = true;
+        this.textContent = 'Creating booking...';
+
+        try {
+            const res = await fetch(API + '/bookings/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify({ busId, journeyDate: date, passengers })
+            });
+            const data = await res.json();
+
+            if (!res.ok) { errEl.textContent = data.error || 'Booking failed.'; return; }
+
+            for (let i = 0; i < totalPassengers; i++) {
+                if (passengers[i].studentData) {
+                    const passId = data.passengers[i]?.id;
+                    const idFile = document.getElementById('p' + i + '_idcard')?.files[0];
+                    await submitStudentVerification(passId, passengers[i].studentData, idFile);
+                }
+            }
+
+            localStorage.setItem('safarPendingBooking', JSON.stringify({
+                bookingId: data.bookingId,
+                pnr: data.pnr,
+                totalFare: data.totalFare,
+                passengers: data.passengers,
+                bus: data.bus,
+                from, to, date
+            }));
+
+            window.location.href = 'payment.html';
+        } catch (e) {
+            errEl.textContent = 'Could not connect to server. Please try again.';
+        } finally {
+            this.disabled = false;
+            this.textContent = 'PROCEED TO PAYMENT →';
+        }
+    });
+
+    loadSeats();
+    buildPassengerForms();
+    updateSummary();
+</script>
+
+</body>
+</html>

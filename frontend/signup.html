@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAR - Sign Up</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .input-group { margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <span class="bus-icon">🚌</span>
+            <span>SAFAR</span>
+        </div>
+        <nav>
+            <a href="home.html">Home</a>
+            <a href="#">Help</a>
+        </nav>
+    </header>
+
+    <main class="login-page">
+
+        <section class="welcome-section">
+            <h1>Join <span>SAFAR</span><br>today.</h1>
+            <p>Create your account and start booking bus tickets easily, securely and affordably.</p>
+            <div class="bus-illustration">🚌</div>
+        </section>
+
+        <section class="login-card">
+            <h2>Create Account</h2>
+            <p class="login-subtitle">Join thousands of happy travellers</p>
+
+            <div class="input-group">
+                <label>Full Name</label>
+                <div class="email-input">
+                    <span>👤</span>
+                    <input type="text" id="name" placeholder="Enter your full name">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <div class="email-input">
+                    <span>✉</span>
+                    <input type="email" id="email" placeholder="Enter your email address">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Phone Number</label>
+                <div class="email-input">
+                    <span>📱</span>
+                    <input type="tel" id="phone" placeholder="Enter your phone number">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <div class="password-input">
+                    <input type="password" id="password" placeholder="Create a password (min 6 characters)">
+                    <button type="button" id="showPassword">👁</button>
+                </div>
+            </div>
+
+            <div id="errorMsg" style="color:#e74c3c;margin-bottom:12px;font-size:14px;display:none;"></div>
+
+            <button class="login-btn" id="signupBtn">CREATE ACCOUNT</button>
+
+            <p class="signup">
+                Already have an account?
+                <a href="login.html">Login</a>
+            </p>
+        </section>
+
+    </main>
+
+    <script>
+        const API = 'http://localhost:3000/api';
+
+        document.getElementById('showPassword').addEventListener('click', function () {
+            const p = document.getElementById('password');
+            p.type = p.type === 'password' ? 'text' : 'password';
+            this.textContent = p.type === 'password' ? '👁' : '🙈';
+        });
+
+        document.getElementById('signupBtn').addEventListener('click', async function () {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const errEl = document.getElementById('errorMsg');
+
+            errEl.style.display = 'none';
+
+            if (!name) { showErr('Please enter your name.'); return; }
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Please enter a valid email.'); return; }
+            if (!password || password.length < 6) { showErr('Password must be at least 6 characters.'); return; }
+
+            this.disabled = true;
+            this.textContent = 'Creating account...';
+
+            try {
+                const res = await fetch(API + '/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, password })
+                });
+                const data = await res.json();
+                if (!res.ok) { showErr(data.error); return; }
+
+                localStorage.setItem('safarToken', data.token);
+                localStorage.setItem('safarUser', JSON.stringify({ name: data.name, email: data.email }));
+                window.location.href = 'home.html';
+            } catch (e) {
+                showErr('Could not connect to server. Make sure the backend is running.');
+            } finally {
+                this.disabled = false;
+                this.textContent = 'CREATE ACCOUNT';
+            }
+
+            function showErr(msg) {
+                errEl.textContent = msg;
+                errEl.style.display = 'block';
+            }
+        });
+    </script>
+
+</body>
+</html>

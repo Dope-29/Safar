@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAR - Payment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #f5f5f0; color: #1a1a1a; }
+
+        .navbar {
+            background: #fff; padding: 16px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #e8e8e8; position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 22px; font-weight: 700; letter-spacing: 2px; text-decoration: none; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { color: #e8c547; }
+
+        .progress-bar {
+            background: #fff; border-bottom: 1px solid #e8e8e8;
+            padding: 16px 40px; display: flex; gap: 0; align-items: center;
+        }
+        .step { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #aaa; }
+        .step.active { color: #1a1a1a; font-weight: 600; }
+        .step.done { color: #27ae60; }
+        .step-num { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .step.active .step-num { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+        .step.done .step-num { border-color: #27ae60; background: #27ae60; color: #fff; }
+        .step-divider { flex: 1; height: 1px; background: #e0e0e0; margin: 0 12px; max-width: 60px; }
+
+        .content { max-width: 800px; margin: 0 auto; padding: 32px 20px; display: grid; grid-template-columns: 1fr 300px; gap: 24px; }
+        @media (max-width: 700px) { .content { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border-radius: 16px; border: 1px solid #e8e8e8; padding: 24px; margin-bottom: 20px; }
+        .card-title { font-size: 16px; font-weight: 700; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+
+        .trip-route { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .trip-detail { font-size: 14px; color: #666; margin-bottom: 4px; }
+
+        .passenger-list { display: flex; flex-direction: column; gap: 10px; }
+        .passenger-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f9f9f9; border-radius: 8px; }
+        .passenger-name { font-size: 14px; font-weight: 600; }
+        .passenger-meta { font-size: 12px; color: #888; margin-top: 2px; }
+        .passenger-fare { font-size: 14px; font-weight: 600; }
+        .student-badge { background: #e8f5e9; color: #27ae60; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+
+        .method-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .method-tab {
+            padding: 10px 18px; border: 2px solid #e0e0e0; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.15s;
+            background: #fff; font-family: inherit;
+        }
+        .method-tab.active { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+
+        .method-form { display: none; }
+        .method-form.show { display: block; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: #888; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px; }
+        .form-group input {
+            width: 100%; padding: 10px 12px; border: 1.5px solid #e0e0e0; border-radius: 8px;
+            font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: #1a1a1a; }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .upi-note { background: #f0f8f0; border-radius: 8px; padding: 14px; font-size: 13px; color: #555; }
+        .wallet-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .wallet-opt {
+            padding: 12px; border: 1.5px solid #e0e0e0; border-radius: 8px;
+            cursor: pointer; text-align: center; font-size: 13px; font-weight: 600;
+            transition: all 0.15s;
+        }
+        .wallet-opt:hover, .wallet-opt.active { border-color: #1a1a1a; background: #f5f5f5; }
+        .wallet-opt .emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+
+        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; color: #555; }
+        .summary-row.total { font-weight: 700; font-size: 18px; color: #1a1a1a; border-top: 1px solid #e8e8e8; padding-top: 12px; margin-top: 8px; }
+        .discount-row { color: #27ae60; }
+
+        .pay-btn {
+            width: 100%; background: #1a1a1a; color: #fff; border: none;
+            padding: 16px; border-radius: 10px; font-size: 15px; font-weight: 700;
+            cursor: pointer; font-family: inherit; margin-top: 16px; transition: background 0.2s;
+        }
+        .pay-btn:hover { background: #333; }
+        .pay-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .secure-note { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #888; margin-top: 10px; justify-content: center; }
+
+        .processing-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 200; align-items: center; justify-content: center;
+        }
+        .processing-overlay.show { display: flex; }
+        .processing-box { background: #fff; border-radius: 16px; padding: 40px; text-align: center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e8e8e8; border-top-color: #1a1a1a; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .processing-text { font-size: 16px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="home.html" class="logo"><span class="logo-icon">✦</span>SAFAR</a>
+</header>
+
+<div class="progress-bar">
+    <div class="step done"><span class="step-num">✓</span> Search</div>
+    <div class="step-divider"></div>
+    <div class="step done"><span class="step-num">✓</span> Select Bus</div>
+    <div class="step-divider"></div>
+    <div class="step done"><span class="step-num">✓</span> Passengers</div>
+    <div class="step-divider"></div>
+    <div class="step active"><span class="step-num">4</span> Payment</div>
+    <div class="step-divider"></div>
+    <div class="step"><span class="step-num">5</span> Ticket</div>
+</div>
+
+<div class="content">
+    <div class="main-col">
+
+        <div class="card">
+            <div class="card-title">🚌 Trip Details</div>
+            <div class="trip-route" id="tripRoute">Loading...</div>
+            <div class="trip-detail" id="tripDate"></div>
+            <div class="trip-detail" id="tripOperator"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">👥 Passengers</div>
+            <div class="passenger-list" id="passengerList"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">💳 Payment Method</div>
+
+            <div class="method-tabs">
+                <button class="method-tab active" data-method="card">💳 Card</button>
+                <button class="method-tab" data-method="upi">📱 UPI</button>
+                <button class="method-tab" data-method="wallet">👛 Wallet</button>
+                <button class="method-tab" data-method="cod">🏦 Net Banking</button>
+            </div>
+
+            <div class="method-form show" id="form-card">
+                <div class="form-group">
+                    <label>Card Number</label>
+                    <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
+                </div>
+                <div class="form-row-2">
+                    <div class="form-group">
+                        <label>Expiry</label>
+                        <input type="text" id="cardExp" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="password" id="cardCvv" placeholder="•••" maxlength="3">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Name on Card</label>
+                    <input type="text" id="cardName" placeholder="As printed on card">
+                </div>
+            </div>
+
+            <div class="method-form" id="form-upi">
+                <div class="upi-note">
+                    <strong>Enter your UPI ID</strong><br>
+                    e.g. name@upi, phone@paytm, phone@gpay
+                </div>
+                <div class="form-group" style="margin-top:14px;">
+                    <label>UPI ID</label>
+                    <input type="text" id="upiId" placeholder="yourname@upi">
+                </div>
+            </div>
+
+            <div class="method-form" id="form-wallet">
+                <div class="wallet-opts">
+                    <div class="wallet-opt active" data-wallet="paytm"><span class="emoji">💙</span>Paytm</div>
+                    <div class="wallet-opt" data-wallet="phonepe"><span class="emoji">💜</span>PhonePe</div>
+                    <div class="wallet-opt" data-wallet="amazonpay"><span class="emoji">🟠</span>Amazon Pay</div>
+                    <div class="wallet-opt" data-wallet="mobikwik"><span class="emoji">🔵</span>MobiKwik</div>
+                </div>
+            </div>
+
+            <div class="method-form" id="form-cod">
+                <div class="form-group">
+                    <label>Bank Name</label>
+                    <input type="text" id="bankName" placeholder="e.g. State Bank of India">
+                </div>
+                <div class="form-group">
+                    <label>Account Number</label>
+                    <input type="text" id="accountNum" placeholder="Your account number">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div>
+        <div class="card" style="position:sticky;top:80px;">
+            <div class="card-title">Fare Summary</div>
+            <div id="summaryRows"></div>
+            <button class="pay-btn" id="payBtn">PAY NOW →</button>
+            <div class="secure-note">🔒 Secured by SAFAR Payment Gateway</div>
+        </div>
+    </div>
+</div>
+
+<div class="processing-overlay" id="processingOverlay">
+    <div class="processing-box">
+        <div class="spinner"></div>
+        <div class="processing-text">Processing Payment...</div>
+        <div style="font-size:13px;color:#888;margin-top:8px;">Please do not close this page</div>
+    </div>
+</div>
+
+<script>
+    const API = 'http://localhost:3000/api';
+    const pending = JSON.parse(localStorage.getItem('safarPendingBooking') || '{}');
+    const token = localStorage.getItem('safarToken');
+
+    if (!pending.bookingId) { window.location.href = 'home.html'; }
+
+    const { bookingId, pnr, totalFare, passengers, bus, from, to, date } = pending;
+
+    document.getElementById('tripRoute').textContent = from + ' → ' + to;
+    document.getElementById('tripDate').textContent = '📅 ' + new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('tripOperator').textContent = '🚌 ' + (bus?.operator || '') + ' · ' + (bus?.departure_time || '') + ' → ' + (bus?.arrival_time || '');
+
+    const passList = document.getElementById('passengerList');
+    passengers.forEach((p, i) => {
+        passList.innerHTML += `
+        <div class="passenger-item">
+            <div>
+                <div class="passenger-name">${p.name} ${p.is_student ? '<span class="student-badge">🎓 Student</span>' : ''}</div>
+                <div class="passenger-meta">${p.gender} · Age ${p.age} · Seat ${p.seat_number || 'TBD'}</div>
+            </div>
+            <div class="passenger-fare">₹${p.fare}</div>
+        </div>`;
+    });
+
+    const summaryEl = document.getElementById('summaryRows');
+    const baseFareTotal = passengers.reduce((s, p) => s + (bus?.fare || p.fare), 0);
+    const studentDiscount = baseFareTotal - totalFare;
+    summaryEl.innerHTML = `
+        <div class="summary-row"><span>Base fare (${passengers.length} pax)</span><span>₹${baseFareTotal}</span></div>
+        ${studentDiscount > 0 ? `<div class="summary-row discount-row"><span>🎓 Student discount</span><span>-₹${studentDiscount}</span></div>` : ''}
+        <div class="summary-row total"><span>Total</span><span>₹${totalFare}</span></div>`;
+
+    document.querySelectorAll('.method-tab').forEach(tab => {
+        tab.addEventListener('click', function () {
+            document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.method-form').forEach(f => f.classList.remove('show'));
+            this.classList.add('active');
+            document.getElementById('form-' + this.dataset.method).classList.add('show');
+        });
+    });
+
+    document.querySelectorAll('.wallet-opt').forEach(opt => {
+        opt.addEventListener('click', function () {
+            document.querySelectorAll('.wallet-opt').forEach(o => o.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    function formatCard(el) {
+        let v = el.value.replace(/\D/g, '').substring(0, 16);
+        el.value = v.replace(/(.{4})/g, '$1 ').trim();
+    }
+
+    document.getElementById('payBtn').addEventListener('click', async function () {
+        const overlay = document.getElementById('processingOverlay');
+        overlay.classList.add('show');
+        this.disabled = true;
+
+        await new Promise(r => setTimeout(r, 2000));
+
+        try {
+            const res = await fetch(`${API}/bookings/confirm/${bookingId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (token || '') },
+                body: JSON.stringify({ method: document.querySelector('.method-tab.active').dataset.method })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                overlay.classList.remove('show');
+                alert(data.error || 'Payment failed.');
+                this.disabled = false;
+                return;
+            }
+
+            localStorage.removeItem('safarPendingBooking');
+            localStorage.setItem('safarLastPNR', data.pnr);
+            window.location.href = 'ticket.html?pnr=' + data.pnr;
+        } catch (e) {
+            overlay.classList.remove('show');
+            alert('Could not process payment. Please try again.');
+            this.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>

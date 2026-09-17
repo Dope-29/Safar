@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAR - Search Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #f5f5f0; color: #1a1a1a; }
+
+        .navbar {
+            background: #fff;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e8e8e8;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 22px; font-weight: 700; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; text-decoration: none; color: #1a1a1a; }
+        .logo-icon { color: #e8c547; }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .account-info { font-size: 14px; color: #666; }
+
+        .page-header {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 32px 40px;
+        }
+        .back-btn {
+            background: none; border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; padding: 6px 16px; border-radius: 20px;
+            cursor: pointer; font-size: 14px; margin-bottom: 16px; display: inline-block;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.1); }
+        .route-display { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .route-meta { color: rgba(255,255,255,0.7); font-size: 15px; }
+        .route-meta span { margin-right: 24px; }
+
+        .content { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+
+        .filters-bar {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            border: 1px solid #e8e8e8;
+        }
+        .filter-label { font-size: 13px; color: #888; font-weight: 600; letter-spacing: 0.5px; }
+        .filter-btn {
+            padding: 6px 16px; border-radius: 20px; border: 1px solid #e0e0e0;
+            background: #fff; cursor: pointer; font-size: 13px; font-family: inherit;
+        }
+        .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+        .results-count { color: #666; font-size: 14px; margin-bottom: 16px; }
+
+        .bus-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid #e8e8e8;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .bus-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+
+        .bus-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .bus-name { font-size: 18px; font-weight: 700; }
+        .bus-number { font-size: 12px; color: #888; margin-top: 2px; }
+        .bus-fare { text-align: right; }
+        .fare-amount { font-size: 26px; font-weight: 700; color: #1a1a1a; }
+        .fare-note { font-size: 12px; color: #888; }
+        .student-fare { font-size: 13px; color: #27ae60; font-weight: 600; }
+
+        .bus-times { display: flex; align-items: center; gap: 24px; margin-bottom: 16px; }
+        .time-block { text-align: center; }
+        .time-big { font-size: 22px; font-weight: 700; }
+        .time-city { font-size: 13px; color: #666; margin-top: 2px; }
+        .duration-line { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .duration-text { font-size: 12px; color: #888; }
+        .line { width: 100%; height: 1px; background: #e0e0e0; position: relative; }
+        .line::before, .line::after { content: '●'; position: absolute; top: -7px; font-size: 10px; color: #ccc; }
+        .line::before { left: -4px; }
+        .line::after { right: -4px; }
+
+        .bus-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .amenities { display: flex; gap: 8px; flex-wrap: wrap; }
+        .amenity-tag { background: #f0f0f0; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #555; }
+        .seats-left { font-size: 13px; }
+        .seats-ok { color: #27ae60; font-weight: 600; }
+        .seats-low { color: #e67e22; font-weight: 600; }
+
+        .select-btn {
+            background: #1a1a1a; color: #fff; border: none; padding: 12px 28px;
+            border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
+            font-family: inherit; transition: background 0.2s;
+        }
+        .select-btn:hover { background: #333; }
+
+        .no-buses {
+            text-align: center; padding: 60px 20px;
+            background: #fff; border-radius: 16px; border: 1px solid #e8e8e8;
+        }
+        .no-buses h3 { font-size: 20px; margin-bottom: 8px; }
+        .no-buses p { color: #888; }
+
+        .loading { text-align: center; padding: 60px; color: #888; font-size: 18px; }
+
+        @media (max-width: 600px) {
+            .navbar { padding: 16px 20px; }
+            .page-header { padding: 24px 20px; }
+            .route-display { font-size: 22px; }
+            .bus-times { gap: 12px; }
+            .time-big { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="home.html" class="logo"><span class="logo-icon">✦</span>SAFAR</a>
+    <div class="nav-right">
+        <span class="account-info" id="accountInfo"></span>
+    </div>
+</header>
+
+<div class="page-header">
+    <button class="back-btn" onclick="window.location.href='home.html'">← Back to Search</button>
+    <div class="route-display" id="routeDisplay">Loading...</div>
+    <div class="route-meta">
+        <span id="dateDisplay"></span>
+        <span id="passengersDisplay"></span>
+    </div>
+</div>
+
+<div class="content">
+
+    <div class="filters-bar">
+        <span class="filter-label">SORT BY</span>
+        <button class="filter-btn active" data-sort="departure">Earliest</button>
+        <button class="filter-btn" data-sort="fare-asc">Cheapest</button>
+        <button class="filter-btn" data-sort="fare-desc">Premium</button>
+        <button class="filter-btn" data-sort="seats">Most Seats</button>
+    </div>
+
+    <div class="results-count" id="resultsCount"></div>
+    <div id="busList"><div class="loading">🔍 Searching buses...</div></div>
+
+</div>
+
+<script>
+    const API = 'http://localhost:3000/api';
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get('from') || '';
+    const to = params.get('to') || '';
+    const date = params.get('date') || '';
+    const adults = parseInt(params.get('adults') || '1');
+    const children = parseInt(params.get('children') || '0');
+    const isStudent = params.get('student') === 'true';
+
+    let allBuses = [];
+
+    const user = JSON.parse(localStorage.getItem('safarUser') || 'null');
+    if (user) document.getElementById('accountInfo').textContent = '👤 ' + user.name;
+
+    document.getElementById('routeDisplay').textContent = from + ' → ' + to;
+    document.getElementById('dateDisplay').textContent = '📅 ' + new Date(date + 'T00:00:00').toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('passengersDisplay').textContent = '👥 ' + (adults + children) + ' Passenger' + ((adults + children) > 1 ? 's' : '');
+
+    async function loadBuses() {
+        try {
+            const res = await fetch(`${API}/buses/search?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&date=${date}`);
+            const data = await res.json();
+            allBuses = data.buses || [];
+            renderBuses(allBuses);
+        } catch (e) {
+            document.getElementById('busList').innerHTML = '<div class="no-buses"><h3>Connection Error</h3><p>Could not connect to server. Please make sure the backend is running.</p></div>';
+        }
+    }
+
+    function calcArrival(dep, arr) {
+        const [dh, dm] = dep.split(':').map(Number);
+        const [ah, am] = arr.split(':').map(Number);
+        let mins = (ah * 60 + am) - (dh * 60 + dm);
+        if (mins < 0) mins += 1440;
+        const h = Math.floor(mins / 60), m = mins % 60;
+        return h + 'h ' + (m > 0 ? m + 'm' : '');
+    }
+
+    function renderBuses(buses) {
+        const list = document.getElementById('busList');
+        document.getElementById('resultsCount').textContent = buses.length + ' bus' + (buses.length !== 1 ? 'es' : '') + ' found';
+
+        if (!buses.length) {
+            list.innerHTML = '<div class="no-buses"><h3>No buses found</h3><p>Try a different date or route.</p></div>';
+            return;
+        }
+
+        list.innerHTML = buses.map(b => {
+            const studentFare = Math.round(b.fare * 0.7);
+            const seatsClass = b.available_seats <= 5 ? 'seats-low' : 'seats-ok';
+            const seatsText = b.available_seats <= 5 ? '⚠️ Only ' + b.available_seats + ' left' : '✓ ' + b.available_seats + ' seats';
+            const amenities = (b.amenities || '').split(',').map(a => `<span class="amenity-tag">${a.trim()}</span>`).join('');
+            const duration = calcArrival(b.departure_time, b.arrival_time);
+
+            return `
+            <div class="bus-card">
+                <div class="bus-header">
+                    <div>
+                        <div class="bus-name">${b.operator}</div>
+                        <div class="bus-number">${b.bus_number}</div>
+                    </div>
+                    <div class="bus-fare">
+                        <div class="fare-amount">₹${b.fare}</div>
+                        <div class="fare-note">per person</div>
+                        ${isStudent ? `<div class="student-fare">🎓 ₹${studentFare} (student)</div>` : ''}
+                    </div>
+                </div>
+                <div class="bus-times">
+                    <div class="time-block">
+                        <div class="time-big">${b.departure_time}</div>
+                        <div class="time-city">${b.source}</div>
+                    </div>
+                    <div class="duration-line">
+                        <div class="duration-text">${duration}</div>
+                        <div class="line"></div>
+                    </div>
+                    <div class="time-block">
+                        <div class="time-big">${b.arrival_time}</div>
+                        <div class="time-city">${b.destination}</div>
+                    </div>
+                </div>
+                <div class="bus-footer">
+                    <div>
+                        <div class="amenities">${amenities}</div>
+                        <div class="seats-left" style="margin-top:8px;"><span class="${seatsClass}">${seatsText}</span></div>
+                    </div>
+                    <button class="select-btn" onclick="selectBus(${b.id}, '${b.operator}', ${b.fare})">
+                        SELECT SEATS →
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function selectBus(busId, operator, fare) {
+        if (!localStorage.getItem('safarToken')) {
+            const redirect = encodeURIComponent(window.location.href);
+            window.location.href = 'login.html?redirect=' + redirect;
+            return;
+        }
+        const bookingData = { busId, operator, fare, from, to, date, adults, children, isStudent };
+        localStorage.setItem('safarBooking', JSON.stringify(bookingData));
+        window.location.href = 'booking.html';
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const sort = this.dataset.sort;
+            let sorted = [...allBuses];
+            if (sort === 'fare-asc') sorted.sort((a, b) => a.fare - b.fare);
+            else if (sort === 'fare-desc') sorted.sort((a, b) => b.fare - a.fare);
+            else if (sort === 'seats') sorted.sort((a, b) => b.available_seats - a.available_seats);
+            else sorted.sort((a, b) => a.departure_time.localeCompare(b.departure_time));
+            renderBuses(sorted);
+        });
+    });
+
+    loadBuses();
+</script>
+
+</body>
+</html>

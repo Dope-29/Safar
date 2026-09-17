@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFAR - Your Ticket</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #f5f5f0; color: #1a1a1a; }
+
+        .navbar {
+            background: #fff; padding: 16px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        .logo { font-size: 22px; font-weight: 700; letter-spacing: 2px; text-decoration: none; color: #1a1a1a; display: flex; align-items: center; gap: 8px; }
+        .logo-icon { color: #e8c547; }
+
+        .success-banner {
+            background: linear-gradient(135deg, #1a1a1a, #333);
+            color: #fff; text-align: center; padding: 40px 20px;
+        }
+        .success-icon { font-size: 48px; margin-bottom: 12px; }
+        .success-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .success-sub { color: rgba(255,255,255,0.7); font-size: 15px; }
+
+        .content { max-width: 700px; margin: 0 auto; padding: 32px 20px; }
+
+        .ticket {
+            background: #fff; border-radius: 20px; border: 1px solid #e8e8e8;
+            overflow: hidden; margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .ticket-header {
+            background: #1a1a1a; color: #fff; padding: 24px 28px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .ticket-brand { font-size: 18px; font-weight: 700; letter-spacing: 2px; }
+        .ticket-status { background: #27ae60; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+
+        .pnr-block { padding: 20px 28px; border-bottom: 1px dashed #e0e0e0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .pnr-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #888; text-transform: uppercase; }
+        .pnr-value { font-size: 24px; font-weight: 700; letter-spacing: 3px; font-family: monospace; }
+        .pnr-date { text-align: right; font-size: 13px; color: #666; }
+
+        .route-block { padding: 24px 28px; display: flex; align-items: center; gap: 0; border-bottom: 1px solid #f0f0f0; }
+        .city-block { text-align: center; min-width: 100px; }
+        .city-name { font-size: 20px; font-weight: 700; }
+        .city-time { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-top: 4px; }
+        .city-label { font-size: 12px; color: #888; margin-top: 2px; }
+        .route-arrow { flex: 1; text-align: center; }
+        .arrow-line { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .arrow-text { font-size: 12px; color: #888; }
+        .arrow-icon { font-size: 20px; }
+
+        .bus-block { padding: 16px 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; border-bottom: 1px solid #f0f0f0; }
+        @media (max-width: 500px) { .bus-block { grid-template-columns: 1fr 1fr; } }
+        .info-item { }
+        .info-label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; color: #888; text-transform: uppercase; margin-bottom: 4px; }
+        .info-value { font-size: 14px; font-weight: 600; }
+
+        .passengers-block { padding: 20px 28px; }
+        .passengers-title { font-size: 13px; font-weight: 700; letter-spacing: 0.5px; color: #888; text-transform: uppercase; margin-bottom: 14px; }
+        .passenger-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; background: #f9f9f9; }
+        .pass-name { font-size: 14px; font-weight: 600; }
+        .pass-meta { font-size: 12px; color: #888; margin-top: 2px; }
+        .pass-seat { font-size: 14px; font-weight: 700; background: #1a1a1a; color: #fff; padding: 4px 10px; border-radius: 6px; }
+
+        .ticket-footer { padding: 16px 28px; background: #f9f9f9; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .total-fare { font-size: 20px; font-weight: 700; }
+        .paid-badge { color: #27ae60; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .action-btn {
+            padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600;
+            cursor: pointer; font-family: inherit; border: none; transition: all 0.15s;
+        }
+        .action-primary { background: #1a1a1a; color: #fff; }
+        .action-primary:hover { background: #333; }
+        .action-outline { background: #fff; color: #1a1a1a; border: 1.5px solid #1a1a1a; }
+        .action-outline:hover { background: #f5f5f5; }
+
+        @media print {
+            .navbar, .actions, .success-banner { display: none; }
+            body { background: #fff; }
+            .content { padding: 0; }
+            .ticket { box-shadow: none; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="navbar">
+    <a href="home.html" class="logo"><span class="logo-icon">✦</span>SAFAR</a>
+</header>
+
+<div class="success-banner">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">Booking Confirmed!</div>
+    <div class="success-sub">Your ticket is ready. Have a safe journey!</div>
+</div>
+
+<div class="content">
+    <div id="ticketContainer"><div style="text-align:center;padding:40px;color:#888;">Loading ticket...</div></div>
+
+    <div class="actions">
+        <button class="action-btn action-primary" onclick="window.print()">🖨️ Print Ticket</button>
+        <button class="action-btn action-outline" onclick="window.location.href='home.html'">🏠 Back to Home</button>
+        <button class="action-btn action-outline" onclick="window.location.href='my-bookings.html'">📋 My Bookings</button>
+    </div>
+</div>
+
+<script>
+    const API = 'http://localhost:3000/api';
+    const params = new URLSearchParams(window.location.search);
+    const pnr = params.get('pnr') || localStorage.getItem('safarLastPNR');
+
+    if (!pnr) { window.location.href = 'home.html'; }
+
+    async function loadTicket() {
+        try {
+            const res = await fetch(`${API}/bookings/ticket/${pnr}`);
+            const data = await res.json();
+
+            if (!res.ok) {
+                document.getElementById('ticketContainer').innerHTML = '<div style="text-align:center;padding:40px;color:#e74c3c;">Ticket not found.</div>';
+                return;
+            }
+
+            const { booking, passengers, bus, payment } = data;
+            const journeyDate = new Date(booking.journey_date + 'T00:00:00');
+
+            function calcDuration(dep, arr) {
+                const [dh, dm] = dep.split(':').map(Number);
+                const [ah, am] = arr.split(':').map(Number);
+                let mins = (ah * 60 + am) - (dh * 60 + dm);
+                if (mins < 0) mins += 1440;
+                return Math.floor(mins / 60) + 'h ' + (mins % 60 > 0 ? mins % 60 + 'm' : '');
+            }
+
+            document.getElementById('ticketContainer').innerHTML = `
+            <div class="ticket">
+                <div class="ticket-header">
+                    <div>
+                        <div class="ticket-brand">✦ SAFAR</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;">Bus Ticket</div>
+                    </div>
+                    <div class="ticket-status">✓ CONFIRMED</div>
+                </div>
+
+                <div class="pnr-block">
+                    <div>
+                        <div class="pnr-label">Booking PNR</div>
+                        <div class="pnr-value">${booking.pnr}</div>
+                    </div>
+                    <div class="pnr-date">
+                        <div style="font-weight:600;">${journeyDate.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                        <div style="color:#888;font-size:13px;margin-top:2px;">Journey Date</div>
+                    </div>
+                </div>
+
+                <div class="route-block">
+                    <div class="city-block">
+                        <div class="city-name">${bus.source}</div>
+                        <div class="city-time">${bus.departure_time}</div>
+                        <div class="city-label">Departure</div>
+                    </div>
+                    <div class="route-arrow">
+                        <div class="arrow-line">
+                            <div class="arrow-text">${calcDuration(bus.departure_time, bus.arrival_time)}</div>
+                            <div class="arrow-icon">→</div>
+                        </div>
+                    </div>
+                    <div class="city-block">
+                        <div class="city-name">${bus.destination}</div>
+                        <div class="city-time">${bus.arrival_time}</div>
+                        <div class="city-label">Arrival</div>
+                    </div>
+                </div>
+
+                <div class="bus-block">
+                    <div class="info-item">
+                        <div class="info-label">Operator</div>
+                        <div class="info-value">${bus.operator}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Bus Number</div>
+                        <div class="info-value">${bus.bus_number}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Passengers</div>
+                        <div class="info-value">${passengers.length}</div>
+                    </div>
+                </div>
+
+                <div class="passengers-block">
+                    <div class="passengers-title">Passengers</div>
+                    ${passengers.map(p => `
+                    <div class="passenger-row">
+                        <div>
+                            <div class="pass-name">${p.name} ${p.is_student ? '<span style="background:#e8f5e9;color:#27ae60;font-size:11px;padding:2px 8px;border-radius:10px;">🎓 Student</span>' : ''}</div>
+                            <div class="pass-meta">${p.gender} · Age ${p.age} · ${p.phone}</div>
+                        </div>
+                        <div class="pass-seat">${p.seat_number || 'TBD'}</div>
+                    </div>`).join('')}
+                </div>
+
+                <div class="ticket-footer">
+                    <div>
+                        <div style="font-size:12px;color:#888;margin-bottom:2px;">Total Paid</div>
+                        <div class="total-fare">₹${booking.total_fare}</div>
+                    </div>
+                    <div class="paid-badge">✓ Payment Successful</div>
+                </div>
+            </div>`;
+        } catch (e) {
+            document.getElementById('ticketContainer').innerHTML = '<div style="text-align:center;padding:40px;color:#e74c3c;">Could not load ticket. Please check your connection.</div>';
+        }
+    }
+
+    loadTicket();
+</script>
+
+</body>
+</html>
