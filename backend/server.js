@@ -17,6 +17,10 @@ app.use('/api/admin', require('./routes/admin'));
 app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date() }));
 
 const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`SAFAR backend running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`SAFAR backend running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;

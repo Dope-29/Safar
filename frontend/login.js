@@ -1,4 +1,4 @@
-const API = 'http://localhost:3000/api';
+const API = '/api';
 
 const password = document.getElementById('password');
 const showPassword = document.getElementById('showPassword');

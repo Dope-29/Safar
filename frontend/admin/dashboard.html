@@ -203,7 +203,7 @@
 </main>
 
 <script>
-    const API = 'http://localhost:3000/api';
+    const API = '/api';
     const adminToken = localStorage.getItem('safarAdminToken');
     const adminName = localStorage.getItem('safarAdminName');
 
@@ -266,7 +266,7 @@
                     <button class="btn-approve" onclick="approveVer(${r.id})">Approve</button>
                     <button class="btn-reject" onclick="rejectVer(${r.id})">Reject</button>
                 </div>` : '—'}
-                ${r.id_card_path ? `<a href="http://localhost:3000/uploads/${r.id_card_path}" target="_blank"><button class="btn-view" style="margin-top:4px">View ID</button></a>` : ''}
+                ${r.id_card_path ? `<a href="/uploads/${r.id_card_path}" target="_blank"><button class="btn-view" style="margin-top:4px">View ID</button></a>` : ''}
             </td>
         </tr>`).join('');
     }

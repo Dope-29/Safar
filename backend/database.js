@@ -2,7 +2,8 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
-const db = new Database(path.join(__dirname, 'safar.db'));
+const dbPath = process.env.VERCEL ? path.join('/tmp', 'safar.db') : path.join(__dirname, 'safar.db');
+const db = new Database(dbPath);
 
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
